@@ -12,14 +12,15 @@ def generate_jwt(payload):
     }, environ.get('JWT_SECRET'), algorithm='HS256')
 
 def decode_jwt(token):
-    return jwt.decode(token, environ.get('JWT_SECRET'), algorithms=['HS256'])
+    try:
+        return jwt.decode(jwt=token, key=environ.get('JWT_SECRET'), algorithms=['HS256'])
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=419, detail="Token expirado")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Token invalido")
+    except jwt.DecodeError:
+        raise HTTPException(status_code=401, detail="Error al decodificar el token")
 
 def verify_jwt(token, output=False):
-    try:
-        decoded = decode_jwt(token)
-        if datetime.utcnow() < datetime.fromtimestamp(decoded['exp']):
-            return succes_response(decoded['sub']) if output else True
-        else:
-            raise HTTPException(status_code=401, detail=error_response("TOKEN_EXPIRADO"))
-    except:
-        raise HTTPException(status_code=401, detail=error_response("TOKEN_INVALIDO"))
+    decoded = decode_jwt(token)
+    return succes_response(decoded['sub']) if output else True

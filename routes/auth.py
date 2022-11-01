@@ -45,4 +45,4 @@ def autoLogin(token: str):
 
 @auth.post('/verificarToken')
 def verify_token(token: str):
-  return verify_jwt(token, True)
+  return verify_jwt(token)
