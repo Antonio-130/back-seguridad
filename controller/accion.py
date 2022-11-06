@@ -7,11 +7,9 @@ def getAllAcciones():
   session.begin()
   try:
     result = session.execute(acciones.select()).fetchall()
-    session.commit()
     return result
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener las acciones")
-    session.rollback()
   finally:
     session.close()
 
@@ -19,11 +17,9 @@ def getAccionById(id):
   session.begin()
   try:
     result = session.execute(acciones.select().where(acciones.c.id == id)).fetchone()
-    session.commit()
     return result
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener la accion")
-    session.rollback()
   finally:
     session.close()
 

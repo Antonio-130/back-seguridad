@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status, Request
-from controller.usuario import getAllAccionesOfUsuario
+from controller.usuario import usuarioHasAccion
 from utils.jwt import decode_jwt
 from utils.response import error_response
 
@@ -10,8 +10,7 @@ async def hasPermission(request: Request):
   else:
     idUsuario = decode_jwt(token.split(" ")[1])["sub"]
     accionRequest = str(request.get("endpoint")).split(" ")[1]
-    acciones = getAllAccionesOfUsuario(idUsuario)
-    for accion in acciones:
-      if accion["nombre"] == accionRequest:
-        return True
-    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=error_response("SIN_PERMISOS"))
+    if usuarioHasAccion(accionRequest, idUsuario):
+      return True
+    else:
+      raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=error_response("SIN_PERMISOS"))

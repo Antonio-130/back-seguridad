@@ -28,11 +28,9 @@ def getAllUsuarios():
           .join(usuarios_grupos, usuarios_grupos.c.id_grupo == grupos.c.id)
           .where(usuarios_grupos.c.id_usuario == usuario[0])).fetchall()
       })
-    session.commit()
     return lista_usuarios
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener los usuarios")
-    session.rollback()
   finally:
     session.close()
 
@@ -52,11 +50,9 @@ def getUsuarioById(id):
       .join(usuarios_grupos, usuarios_grupos.c.id_grupo == grupos.c.id)
       .where(usuarios_grupos.c.id_usuario == result[0])).fetchall()
     }
-    session.commit()
     return usuario
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener el usuario")
-    session.rollback()
   finally:
     session.close()
 
@@ -64,11 +60,9 @@ def getUsuarioByUsername(username):
   session.begin()
   try:
     usuario = session.execute(usuarios.select().where(usuarios.c.username == username)).fetchone()
-    session.commit()
     return usuario
-  except Exception as e:
-    print(e)
-    session.rollback()
+  except:
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener el usuario")
   finally:
     session.close()
 
@@ -76,11 +70,9 @@ def getUsuarioByEmail(email):
   session.begin()
   try:
     usuario = session.execute(usuarios.select().where(usuarios.c.email == email)).fetchone()
-    session.commit()
     return usuario
-  except Exception as e:
-    print(e)
-    session.rollback()
+  except:
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener el usuario")
   finally:
     session.close()
 
@@ -157,10 +149,25 @@ def getAllAccionesOfUsuario(id):
         "nombre": accion[0],
         "tag": accion[1]
       })
-    session.commit()
     return lista_acciones
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener las acciones del usuario")
-    session.rollback()
+  finally:
+    session.close()
+
+def usuarioHasAccion(nombre_accion, id_usuario):
+  session.begin()
+  try:
+    accion = session.execute(select([acciones.c.id])
+    .join(grupos_acciones, grupos_acciones.c.id_accion == acciones.c.id)
+    .join(usuarios_grupos, usuarios_grupos.c.id_grupo == grupos_acciones.c.id_grupo)
+    .where(usuarios_grupos.c.id_usuario == id_usuario)
+    .where(acciones.c.nombre == nombre_accion)).fetchone()
+    if accion:
+      return True
+    else:
+      return False
+  except:
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="EL usuario no tiene la accion")
   finally:
     session.close()

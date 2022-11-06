@@ -20,11 +20,9 @@ def getAllGrupos():
         .join(acciones, grupos_acciones.c.id_accion == acciones.c.id)
         .where(grupos_acciones.c.id_grupo == grupo[0])).fetchall()
       })
-    session.commit()
     return lista_grupos
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener los grupos")
-    session.rollback()
   finally:
     session.close()
 
@@ -42,11 +40,9 @@ def getGrupoById(id):
         .where(grupos_acciones.c.id_grupo == result[0])
       ).fetchall()
     }
-    session.commit()
     return grupo
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener el grupo")
-    session.rollback()
   finally:
     session.close()
 
@@ -102,10 +98,8 @@ def getAccionesByGrupo(id):
       .join(acciones, grupos_acciones.c.id_accion == acciones.c.id)
       .where(grupos_acciones.c.id_grupo == id)
     ).fetchall()
-    session.commit()
     return result
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al obtener las acciones del grupo")
-    session.rollback()
   finally:
     session.close()
