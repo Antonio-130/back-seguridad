@@ -8,7 +8,8 @@ async def hasPermission(request: Request):
   if token == None:
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=error_response("SIN_AUTORIZACION"))
   else:
-    idUsuario = decode_jwt(token.split(" ")[1])["sub"]
+    token = token[7:]
+    idUsuario = decode_jwt(token)["sub"]
     accionRequest = str(request.get("endpoint")).split(" ")[1]
     if usuarioHasAccion(accionRequest, idUsuario):
       return True
