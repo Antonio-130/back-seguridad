@@ -16,7 +16,7 @@ def getAllGrupos():
         "id": grupo[0],
         "nombre": grupo[1],
         "descripcion": grupo[2],
-        "acciones": session.execute(select([grupos_acciones.c.id_accion, acciones.c.nombre])
+        "acciones": session.execute(select([grupos_acciones.c.id_accion, acciones.c.nombre,acciones.c.tag])
         .join(acciones, grupos_acciones.c.id_accion == acciones.c.id)
         .where(grupos_acciones.c.id_grupo == grupo[0])).fetchall()
       })
@@ -35,7 +35,7 @@ def getGrupoById(id):
       "nombre": result[1],
       "descripcion": result[2],
       "acciones": session.execute(
-        select([grupos_acciones.c.id_accion, acciones.c.nombre])
+        select([grupos_acciones.c.id_accion, acciones.c.nombre, acciones.c.tag])
         .join(acciones, grupos_acciones.c.id_accion == acciones.c.id)
         .where(grupos_acciones.c.id_grupo == result[0])
       ).fetchall()
