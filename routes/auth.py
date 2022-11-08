@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from utils.jwt import generate_jwt, verify_jwt
 from schemas.usuario import UsuarioLogin
+from schemas.token import Token
 from controller.usuario import getUsuarioById
 from utils.usuario import verify_user_exists, getAllAccionesOfUsuario
 from utils.response import succes_response
@@ -29,8 +30,8 @@ def login(user: UsuarioLogin):
   return succes_response([user_data, token, acciones])
 
 @auth.post('/autoLogin')
-def autoLogin(token: str):
-  user_id = verify_jwt(token, True)['data']
+def autoLogin(token: Token):
+  user_id = verify_jwt(token.token, True)['data']
   user = getUsuarioById(user_id)
   user_data = {
     'nombre': user['nombre'],
@@ -44,5 +45,5 @@ def autoLogin(token: str):
 
 
 @auth.post('/verificarToken')
-def verify_token(token: str):
-  return verify_jwt(token)
+def verify_token(token: Token):
+  return verify_jwt(token.token)
