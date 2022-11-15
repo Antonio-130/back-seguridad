@@ -5,6 +5,7 @@ class AccionGrupo (BaseModel):
   id_accion: int
   nombre: str
   tag: str
+  descripcion: str
 
 class Grupo (BaseModel):
   id: Optional[int]

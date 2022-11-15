@@ -49,3 +49,8 @@ class UsuarioLogin (BaseModel):
   username: Optional[str]
   email: Optional[str]
   clave: str
+
+class ChangeClave (BaseModel):
+  token: str
+  clave: str
+  newClave: str

@@ -6,6 +6,7 @@ acciones = Table("acciones", meta,
   Column("id", Integer, autoincrement=True, primary_key=True),
   Column("nombre", String(30), nullable=False),
   Column("tag", String(30), nullable=False),
+  Column("descripcion", String(50), nullable=False),
   UniqueConstraint("nombre", name="uq_accion_nombre")
 )
 

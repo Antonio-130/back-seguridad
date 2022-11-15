@@ -5,10 +5,12 @@ class Accion (BaseModel):
   id: Optional[int]
   nombre: str
   tag: str
+  descripcion: str
 
 class AccionIn (BaseModel):
   nombre: str
   tag: str
+  descripcion: str
 
 class AccionStatus (BaseModel):
   status: str

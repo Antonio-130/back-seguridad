@@ -6,7 +6,7 @@ from models.usuarios_grupos import usuarios_grupos
 from models.grupos_acciones import grupos_acciones
 from models.accion import acciones
 from sqlalchemy import select, join
-from utils.password import encrypt_password
+from utils.password import encrypt_password, compare_password
 from datetime import datetime
 from fastapi import HTTPException, status
 
@@ -169,5 +169,23 @@ def usuarioHasAccion(nombre_accion, id_usuario):
       return False
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="EL usuario no tiene la accion")
+  finally:
+    session.close()
+
+def changeClave(id, clave, newClave):
+  session.begin()
+  try:
+    usuario = session.execute(usuarios.select().where(usuarios.c.id == id)).fetchone()
+    if not usuario:
+      raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
+    if compare_password(clave, usuario["clave"]):
+      session.execute(usuarios.update().where(usuarios.c.id == id).values({"clave": encrypt_password(newClave)}))
+      session.commit()
+      return True
+    else:
+      raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="La clave actual es incorrecta")
+  except:
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al cambiar la clave")
+    session.rollback()
   finally:
     session.close()
