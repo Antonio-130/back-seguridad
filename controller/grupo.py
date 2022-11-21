@@ -54,7 +54,7 @@ def createGrupo(grupo):
       for accion in grupo.acciones:
         session.execute(grupos_acciones.insert().values({"id_grupo": result.inserted_primary_key[0], "id_accion": accion}))
     session.commit()
-    return True
+    return {'detail': 'Grupo creado correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al crear el grupo")
     session.rollback()
@@ -69,7 +69,7 @@ def updateGrupo(id, grupo):
     for accion in grupo.acciones:
       session.execute(grupos_acciones.insert().values({"id_grupo": id, "id_accion": accion}))
     session.commit()
-    return True
+    return {'detail': 'Grupo actualizado correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al actualizar el grupo")
     session.rollback()
@@ -83,7 +83,7 @@ def deleteGrupo(id):
     session.execute(grupos_acciones.delete().where(grupos_acciones.c.id_grupo == id))
     session.execute(usuarios_grupos.delete().where(usuarios_grupos.c.id_grupo == id))
     session.commit()
-    return True
+    return {'detail': 'Grupo eliminado correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al eliminar el grupo")
     session.rollback()

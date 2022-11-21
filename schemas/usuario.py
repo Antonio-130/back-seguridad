@@ -37,20 +37,12 @@ class UsuarioUpdate (BaseModel):
   estado: Optional[int]
   grupos: Optional[list[int]]
 
-class UsuarioStatus (BaseModel):
-  status: str
-  data: Optional[Usuario]
-
-class UsuarioListStatus (BaseModel):
-  status: str
-  data: Optional[list[Usuario]]
-
 class UsuarioLogin (BaseModel):
   username: Optional[str]
   email: Optional[str]
   clave: str
 
-class ChangeClave (BaseModel):
-  token: str
+class UsuarioChangeClave (BaseModel):
+  id: int
   clave: str
   newClave: str

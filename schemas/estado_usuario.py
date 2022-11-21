@@ -7,11 +7,3 @@ class EstadoUsuario (BaseModel):
 
 class EstadoUsuarioIn (BaseModel):
   nombre: str
-
-class EsatadoUsuarioStatus (BaseModel):
-  status: str
-  data: Optional[EstadoUsuario]
-
-class EsatadoUsuarioListStatus (BaseModel):
-  status: str
-  data: Optional[list[EstadoUsuario]]

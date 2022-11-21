@@ -9,6 +9,7 @@ from sqlalchemy import select, join
 from utils.password import encrypt_password, compare_password
 from datetime import datetime
 from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
 
 def getAllUsuarios():
   session.begin()
@@ -93,7 +94,7 @@ def createUsuario(usuario):
       for grupo in usuario.grupos:
         session.execute(usuarios_grupos.insert().values({"id_usuario": result.inserted_primary_key[0], "id_grupo": grupo}))
     session.commit()
-    return True
+    return {'detail': 'Usuario creado correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al crear el usuario")
     session.rollback()
@@ -116,7 +117,7 @@ def updateUsuario(id, usuario):
       for grupo in usuario.grupos:
         session.execute(usuarios_grupos.insert().values({"id_usuario": id, "id_grupo": grupo}))
     session.commit()
-    return True
+    return {'detail': 'Usuario actualizado correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al actualizar el usuario")
     session.rollback()
@@ -129,7 +130,7 @@ def deleteUsuario(id):
     session.execute(usuarios.delete().where(usuarios.c.id == id))
     session.execute(usuarios_grupos.delete().where(usuarios_grupos.c.id_usuario == id))
     session.commit()
-    return True
+    return {'detail': 'Usuario eliminado correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al eliminar el usuario")
     session.rollback()
@@ -178,12 +179,13 @@ def changeClave(id, clave, newClave):
     usuario = session.execute(usuarios.select().where(usuarios.c.id == id)).fetchone()
     if not usuario:
       raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado")
-    if compare_password(clave, usuario["clave"]):
+    validate = bool(compare_password(clave, usuario["clave"]))
+    if validate:
       session.execute(usuarios.update().where(usuarios.c.id == id).values({"clave": encrypt_password(newClave)}))
       session.commit()
-      return True
+      return {'detail': 'Clave actualizada correctamente'}
     else:
-      raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="La clave actual es incorrecta")
+      return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content={'detail': 'Clave incorrecta'})
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al cambiar la clave")
     session.rollback()

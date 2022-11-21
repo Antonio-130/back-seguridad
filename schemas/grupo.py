@@ -17,11 +17,3 @@ class GrupoIn (BaseModel):
   nombre: str
   descripcion: str
   acciones: list[int]
-
-class GrupoStatus (BaseModel):
-  status: str
-  data: Optional[Grupo]
-
-class GrupoListStatus (BaseModel):
-  status: str
-  data: Optional[list[Grupo]]

@@ -28,7 +28,7 @@ def createAccion(accion):
   try:
     session.execute(acciones.insert().values({"nombre": accion.nombre, "tag": accion.tag}))
     session.commit()
-    return True
+    return {'detail': 'Accion creada correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al crear la accion")
     session.rollback()
@@ -40,7 +40,7 @@ def updateAccion(id, accion):
   try:
     session.execute(acciones.update().where(acciones.c.id == id).values({"nombre": accion.nombre, "tag": accion.tag}))
     session.commit()
-    return True
+    return {'detail': 'Accion actualizada correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al actualizar la accion")
     session.rollback()
@@ -53,7 +53,7 @@ def deleteAccion(id):
     session.execute(acciones.delete().where(acciones.c.id == id))
     session.execute(grupos_acciones.delete().where(grupos_acciones.c.id_accion == id))
     session.commit()
-    return True
+    return {'detail': 'Accion eliminada correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al eliminar la accion")
     session.rollback()

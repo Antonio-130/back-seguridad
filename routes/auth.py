@@ -1,11 +1,14 @@
 from fastapi import APIRouter, HTTPException, status
 from utils.jwt import generate_jwt, verify_jwt
-from schemas.usuario import UsuarioLogin, ChangeClave
+from schemas.usuario import UsuarioLogin, UsuarioChangeClave
 from schemas.status import Status
 from schemas.token import Token
 from controller.usuario import getUsuarioById, changeClave
 from utils.usuario import verify_user_exists, getAllAccionesOfUsuario
-from utils.response import succes_response
+
+from schemas.email import EmailSchema
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
+from os import environ
 
 auth = APIRouter(
   tags=["Auth"]
@@ -17,6 +20,7 @@ def login(user: UsuarioLogin):
   jwt = generate_jwt(user_id)
   user = getUsuarioById(user_id)
   user_data = {
+    'id': user['id'],
     'nombre': user['nombre'],
     'apellido': user['apellido'],
     'username': user['username'],
@@ -28,13 +32,14 @@ def login(user: UsuarioLogin):
     'acciones': getAllAccionesOfUsuario(user_id)
   }
 
-  return succes_response([user_data, token, acciones])
+  return [user_data, token, acciones]
 
 @auth.post('/autoLogin')
 def autoLogin(token: Token):
-  user_id = verify_jwt(token.token, True)['data']
+  user_id = verify_jwt(token.token, True)
   user = getUsuarioById(user_id)
   user_data = {
+    'id': user['id'],
     'nombre': user['nombre'],
     'apellido': user['apellido'],
     'username': user['username'],
@@ -42,7 +47,7 @@ def autoLogin(token: Token):
   acciones = {
     'acciones': getAllAccionesOfUsuario(user_id)
   }
-  return succes_response([user_data, acciones])
+  return [user_data, acciones]
 
 
 @auth.post('/verificarToken')
@@ -50,11 +55,39 @@ def verify_token(token: Token):
   return verify_jwt(token.token)
 
 @auth.put("/changeClave", response_model=Status)
-def change_clave(claves: ChangeClave):
-  user_id = verify_jwt(claves.token, True)['data']
-  print(user_id)
-  result = changeClave(user_id, claves.clave, claves.newClave)
-  if result:
-    return succes_response()
-  else:
-    return error_response("NO_ACTUALIZADO")
+def change_clave(user: UsuarioChangeClave):
+  return changeClave(user.id, user.clave, user.newClave)
+
+@auth.post("/email", response_model=Status)
+async def send_email(email: EmailSchema):
+  conf = ConnectionConfig(
+    MAIL_USERNAME = environ.get('MAIL_USER'),
+    MAIL_PASSWORD = environ.get('MAIL_PASSWORD'),
+    MAIL_FROM = environ.get('MAIL_USER'),
+    MAIL_PORT = 587,
+    MAIL_SERVER = "smtp.gmail.com",
+    MAIL_FROM_NAME="Modulo Seguridad",
+    MAIL_STARTTLS = True,
+    MAIL_SSL_TLS = False,
+    USE_CREDENTIALS = True,
+    VALIDATE_CERTS = True
+  )
+
+  html = """
+    <h4>Hola {0}!</h4><br/>
+    <p>Tu clave de acceso es: <b>{1}</b></p>""".format(email.username, email.new_clave)
+
+  message = MessageSchema(
+    subject="no-reply",
+    recipients=[email.email],
+    body=html,
+    subtype=MessageType.html,
+  )
+
+  fm = FastMail(conf)
+  try:
+    await fm.send_message(message)
+    return {"detail": "Email enviado"}
+  except Exception as e:
+    print(e)
+    return {"detail": "Email no enviado"}

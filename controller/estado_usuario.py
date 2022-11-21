@@ -28,7 +28,7 @@ def createEstadoUsuario(estado_usuario):
   try:
     session.execute(estados_usuario.insert().values({"nombre": estado_usuario.nombre}))
     session.commit()
-    return True
+    return {'detail': 'Estado de usuario creado correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al crear el estado de usuario")
     session.rollback()
@@ -40,7 +40,7 @@ def updateEstadoUsuario(id, estado_usuario):
   try:
     session.execute(estados_usuario.update().where(estados_usuario.c.id == id).values({"nombre": estado_usuario.nombre}))
     session.commit()
-    return True
+    return {'detail': 'Estado de usuario actualizado correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al actualizar el estado de usuario")
     session.rollback()
@@ -53,7 +53,7 @@ def deleteEstadoUsuario(id):
     session.execute(estados_usuario.delete().where(estados_usuario.c.id == id))
     session.excetute(usuarios.update().where(usuarios.c.estado == id).values({"estado": null}))
     session.commit()
-    return True
+    return {'detail': 'Estado de usuario eliminado correctamente'}
   except:
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al eliminar el estado de usuario")
     session.rollback()

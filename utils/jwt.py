@@ -2,7 +2,6 @@ import jwt
 from datetime import datetime, timedelta
 from os import environ
 from fastapi import HTTPException
-from utils.response import succes_response, error_response
 
 def generate_jwt(payload):
     return jwt.encode({
@@ -23,4 +22,4 @@ def decode_jwt(token):
 
 def verify_jwt(token, output=False):
     decoded = decode_jwt(token)
-    return succes_response(decoded['sub']) if output else True
+    return decoded['sub'] if output else True
