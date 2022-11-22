@@ -7,7 +7,8 @@ from middleware.permission import hasPermission
 
 usuario = APIRouter(
   prefix="/usuarios",
-  tags=["Usuarios"]
+  tags=["Usuarios"],
+  dependencies=[Depends(verify_token_header), Depends(hasPermission)]
 )
 
 @usuario.get("", response_model=list[Usuario])

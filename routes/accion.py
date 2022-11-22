@@ -1,11 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from schemas.accion import Accion, AccionIn
 from schemas.status import Status
 from controller.accion import getAllAcciones, getAccionById, createAccion, updateAccion, deleteAccion
+from middleware.verifyTokenRoute import verify_token_header
+from middleware.permission import hasPermission
 
 accion = APIRouter(
   prefix="/acciones",
-  tags=["Acciones"]
+  tags=["Acciones"],
+  dependencies=[Depends(verify_token_header), Depends(hasPermission)]
 )
 
 @accion.get("", response_model=list[Accion])

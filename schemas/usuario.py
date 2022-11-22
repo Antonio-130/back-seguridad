@@ -46,3 +46,7 @@ class UsuarioChangeClave (BaseModel):
   id: int
   clave: str
   newClave: str
+
+class UsuarioResetClave (BaseModel):
+  id: int
+  clave: str

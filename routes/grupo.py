@@ -4,10 +4,12 @@ from schemas.status import Status
 from controller.grupo import getAllGrupos, getGrupoById, createGrupo, updateGrupo, deleteGrupo
 from middleware.verifyTokenRoute import verify_token_header
 from middleware.permission import hasPermission
+from middleware.verifyTokenRoute import verify_token_header
 
 grupo = APIRouter(
   prefix="/grupos",
-  tags=["Grupos"]
+  tags=["Grupos"],
+  dependencies=[Depends(verify_token_header), Depends(hasPermission)]
 )
 
 @grupo.get("", response_model=list[Grupo])

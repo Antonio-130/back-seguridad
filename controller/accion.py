@@ -26,7 +26,7 @@ def getAccionById(id):
 def createAccion(accion):
   session.begin()
   try:
-    session.execute(acciones.insert().values({"nombre": accion.nombre, "tag": accion.tag}))
+    session.execute(acciones.insert().values({"nombre": accion.nombre, "tag": accion.tag, "descripcion": accion.descripcion}))
     session.commit()
     return {'detail': 'Accion creada correctamente'}
   except:

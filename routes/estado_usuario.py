@@ -1,11 +1,14 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from schemas.estado_usuario import EstadoUsuario, EstadoUsuarioIn
 from schemas.status import Status
 from controller.estado_usuario import getAllEstadosUsuario, getEstadoUsuario, createEstadoUsuario, updateEstadoUsuario, deleteEstadoUsuario
+from middleware.verifyTokenRoute import verify_token_header
+from middleware.permission import hasPermission
 
 estadoUsuario = APIRouter(
   prefix="/estadosUsuario",
-  tags=["EstadosUsuario"]
+  tags=["EstadosUsuario"],
+  dependencies=[Depends(verify_token_header), Depends(hasPermission)]
 )
 
 @estadoUsuario.get("", response_model=list[EstadoUsuario])

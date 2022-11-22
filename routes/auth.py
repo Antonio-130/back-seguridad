@@ -1,10 +1,12 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from utils.jwt import generate_jwt, verify_jwt
-from schemas.usuario import UsuarioLogin, UsuarioChangeClave
+from schemas.usuario import UsuarioLogin, UsuarioChangeClave, UsuarioResetClave
 from schemas.status import Status
 from schemas.token import Token
-from controller.usuario import getUsuarioById, changeClave
+from controller.usuario import getUsuarioById, changeClave, resetClave
 from utils.usuario import verify_user_exists, getAllAccionesOfUsuario
+from middleware.permission import hasPermission
+from middleware.verifyTokenRoute import verify_token_header
 
 from schemas.email import EmailSchema
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
@@ -58,7 +60,11 @@ def verify_token(token: Token):
 def change_clave(user: UsuarioChangeClave):
   return changeClave(user.id, user.clave, user.newClave)
 
-@auth.post("/email", response_model=Status)
+@auth.put("/resetClave", response_model=Status, dependencies=[Depends(hasPermission)])
+def reset_clave(user: UsuarioResetClave):
+  return resetClave(user.id, user.clave)
+
+@auth.post("/email", response_model=Status, dependencies=[Depends(hasPermission)])
 async def send_email(email: EmailSchema):
   conf = ConnectionConfig(
     MAIL_USERNAME = environ.get('MAIL_USER'),

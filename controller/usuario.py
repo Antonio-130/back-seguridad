@@ -191,3 +191,15 @@ def changeClave(id, clave, newClave):
     session.rollback()
   finally:
     session.close()
+
+def resetClave(id, clave):
+  session.begin()
+  try:
+    session.execute(usuarios.update().where(usuarios.c.id == id).values({"clave": encrypt_password(clave)}))
+    session.commit()
+    return {'detail': 'Clave reseteada correctamente'}
+  except:
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al resetear la clave")
+    session.rollback()
+  finally:
+    session.close()
