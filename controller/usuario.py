@@ -107,13 +107,14 @@ def updateUsuario(id, usuario):
     "nombre": usuario.nombre,
     "apellido": usuario.apellido,
     "username": usuario.username,
-    "email": usuario.email,
-    "estado": usuario.estado,
+    "email": usuario.email
   }
+  if usuario.estado:
+    usuario_to_update["estado"] = usuario.estado
   try:
     session.execute(usuarios.update().where(usuarios.c.id == id).values(usuario_to_update))
-    session.execute(usuarios_grupos.delete().where(usuarios_grupos.c.id_usuario == id))
     if usuario.grupos:
+      session.execute(usuarios_grupos.delete().where(usuarios_grupos.c.id_usuario == id))
       for grupo in usuario.grupos:
         session.execute(usuarios_grupos.insert().values({"id_usuario": id, "id_grupo": grupo}))
     session.commit()
