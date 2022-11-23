@@ -1,4 +1,4 @@
-## Principales Tecnologias utilizadas
+## Principales tecnologías utilizadas
 
 - [Python](https://www.python.org/)
 - [FastAPI](https://fastapi.tiangolo.com/)
